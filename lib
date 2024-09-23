@@ -1,16 +1,24 @@
 -- UI Library Module
 local UILibrary = {}
 
+-- Variables to track button positioning
+local buttonCount = 0
+local buttonSpacing = 10 -- Space between buttons
+local defaultButtonSize = UDim2.new(0, 200, 0, 50)
+
 -- Function to create a new button
-function UILibrary.CreateButton(parent, buttonText, position, size, callback)
+function UILibrary.CreateButton(parent, buttonText, callback)
+    -- Calculate position based on the number of buttons
+    local buttonPosition = UDim2.new(0.5, 0, 0, buttonCount * (defaultButtonSize.Y.Offset + buttonSpacing))
+
     -- Create the button
     local button = Instance.new("TextButton")
     
     -- Set default properties
     button.Text = buttonText or "Button"
-    button.Position = position or UDim2.new(0.5, 0, 0.5, 0)
-    button.Size = size or UDim2.new(0, 200, 0, 50)
-    button.AnchorPoint = Vector2.new(0.5, 0.5)
+    button.Position = buttonPosition
+    button.Size = defaultButtonSize
+    button.AnchorPoint = Vector2.new(0.5, 0) -- Anchor to top center
     button.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
     button.TextColor3 = Color3.fromRGB(255, 255, 255)
     button.Font = Enum.Font.SourceSansBold
@@ -24,8 +32,16 @@ function UILibrary.CreateButton(parent, buttonText, position, size, callback)
         button.MouseButton1Click:Connect(callback)
     end
 
+    -- Increment button count to adjust position for the next button
+    buttonCount = buttonCount + 1
+
     -- Return the button in case further customization is needed
     return button
+end
+
+-- Reset button count (useful if you want to reset the button positions later)
+function UILibrary.ResetButtonCount()
+    buttonCount = 0
 end
 
 return UILibrary
