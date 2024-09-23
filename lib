@@ -6,8 +6,39 @@ local buttonCount = 0
 local buttonSpacing = 10 -- Space between buttons
 local defaultButtonSize = UDim2.new(0, 200, 0, 50)
 
--- Function to create a new button
-function UILibrary.CreateButton(parent, buttonText, callback)
+-- Function to create the main UI frame and close button
+function UILibrary.CreateFrame(parent)
+    -- Create a frame
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 250, 0, 300)
+    frame.Position = UDim2.new(0.5, -125, 0.5, -150) -- Center frame
+    frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    frame.BorderSizePixel = 2
+    frame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    frame.Parent = parent
+
+    -- Create close button
+    local closeButton = Instance.new("TextButton")
+    closeButton.Text = "Close"
+    closeButton.Size = UDim2.new(0, 80, 0, 30)
+    closeButton.Position = UDim2.new(1, -90, 0, 10) -- Top right corner inside frame
+    closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeButton.Font = Enum.Font.SourceSansBold
+    closeButton.TextSize = 18
+    closeButton.Parent = frame
+
+    -- Toggle frame visibility when close button is clicked
+    closeButton.MouseButton1Click:Connect(function()
+        frame.Visible = not frame.Visible
+    end)
+
+    -- Return the frame so that buttons can be added later
+    return frame
+end
+
+-- Function to create a new button inside the frame
+function UILibrary.CreateButton(frame, buttonText, callback)
     -- Calculate position based on the number of buttons
     local buttonPosition = UDim2.new(0.5, 0, 0, buttonCount * (defaultButtonSize.Y.Offset + buttonSpacing))
 
@@ -24,8 +55,8 @@ function UILibrary.CreateButton(parent, buttonText, callback)
     button.Font = Enum.Font.SourceSansBold
     button.TextSize = 24
 
-    -- Parent the button to the provided parent (usually ScreenGui)
-    button.Parent = parent
+    -- Parent the button to the provided frame
+    button.Parent = frame
     
     -- Set up a click event for the button
     if callback then
