@@ -6,6 +6,48 @@ local buttonCount = 0
 local buttonSpacing = 10 -- Space between buttons
 local defaultButtonSize = UDim2.new(0, 200, 0, 50)
 
+-- Function to make a frame draggable
+local function MakeFrameDraggable(frame, dragHandle)
+    local dragging = false
+    local dragInput, dragStart, startPos
+
+    local function update(input)
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+
+    dragHandle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    dragHandle.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+
+    dragHandle.InputChanged:Connect(function(input)
+        if dragging and input == dragInput then
+            update(input)
+        end
+    end)
+end
+
 -- Function to create the main UI frame and close button
 function UILibrary.CreateFrame(parent)
     -- Create a frame
@@ -17,11 +59,25 @@ function UILibrary.CreateFrame(parent)
     frame.BorderColor3 = Color3.fromRGB(255, 255, 255)
     frame.Parent = parent
 
+    -- Create a draggable title bar
+    local titleBar = Instance.new("TextLabel")
+    titleBar.Size = UDim2.new(1, 0, 0, 30)
+    titleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    titleBar.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleBar.Font = Enum.Font.SourceSansBold
+    titleBar.Text = "UI Frame"
+    titleBar.TextSize = 18
+    titleBar.TextXAlignment = Enum.TextXAlignment.Left
+    titleBar.Parent = frame
+
+    -- Make the frame draggable by dragging the title bar
+    MakeFrameDraggable(frame, titleBar)
+
     -- Create close button
     local closeButton = Instance.new("TextButton")
     closeButton.Text = "Close"
     closeButton.Size = UDim2.new(0, 80, 0, 30)
-    closeButton.Position = UDim2.new(1, -90, 0, 10) -- Top right corner inside frame
+    closeButton.Position = UDim2.new(1, -90, 0, 0) -- Top right corner inside frame
     closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
     closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     closeButton.Font = Enum.Font.SourceSansBold
@@ -40,7 +96,7 @@ end
 -- Function to create a new button inside the frame
 function UILibrary.CreateButton(frame, buttonText, callback)
     -- Calculate position based on the number of buttons
-    local buttonPosition = UDim2.new(0.5, 0, 0, buttonCount * (defaultButtonSize.Y.Offset + buttonSpacing))
+    local buttonPosition = UDim2.new(0.5, 0, 0, 30 + buttonCount * (defaultButtonSize.Y.Offset + buttonSpacing))
 
     -- Create the button
     local button = Instance.new("TextButton")
