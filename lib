@@ -3,7 +3,7 @@ local UILibrary = {}
 
 -- Variables to track element positioning
 local elementCount = 0
-local elementSpacing = 10 -- Space between elements
+local elementSpacing = 15 -- Space between elements (larger for more separation)
 local defaultButtonSize = UDim2.new(0, 200, 0, 50)
 local defaultInputSize = UDim2.new(0, 200, 0, 30)
 local defaultSliderSize = UDim2.new(0, 200, 0, 30)
@@ -97,7 +97,7 @@ end
 
 -- Function to create a new button inside the frame
 function UILibrary.CreateButton(frame, buttonText, callback)
-    -- Calculate position based on the number of elements
+    -- Calculate position based on the number of elements and spacing
     local buttonPosition = UDim2.new(0.5, 0, 0, 30 + elementCount * (defaultButtonSize.Y.Offset + elementSpacing))
 
     -- Create the button
@@ -130,7 +130,7 @@ end
 
 -- Function to create a new input field with an action button inside the frame
 function UILibrary.CreateInput(frame, placeholderText, buttonText, callback)
-    -- Calculate position based on the number of elements
+    -- Calculate position based on the number of elements and spacing
     local inputPosition = UDim2.new(0.5, 0, 0, 30 + elementCount * (defaultInputSize.Y.Offset + elementSpacing))
 
     -- Create a TextBox for input
@@ -173,7 +173,7 @@ end
 
 -- Function to create a slider inside the frame
 function UILibrary.CreateSlider(frame, sliderText, minValue, maxValue, callback)
-    -- Calculate position based on the number of elements
+    -- Calculate position based on the number of elements and spacing
     local sliderPosition = UDim2.new(0.5, 0, 0, 30 + elementCount * (defaultSliderSize.Y.Offset + elementSpacing))
 
     -- Create a label for the slider
@@ -189,18 +189,22 @@ function UILibrary.CreateSlider(frame, sliderText, minValue, maxValue, callback)
     sliderLabel.Parent = frame
 
     -- Create the actual slider
-    local slider = Instance.new("Slider")
-    slider.MinValue = minValue or 0
-    slider.MaxValue = maxValue or 100
+    local slider = Instance.new("TextButton") -- Simulating a slider
     slider.Position = sliderPosition + UDim2.new(0, 0, 0, defaultSliderSize.Y.Offset + elementSpacing)
     slider.Size = defaultSliderSize
     slider.AnchorPoint = Vector2.new(0.5, 0)
+    slider.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    slider.Text = "Adjust Me"
+    slider.TextColor3 = Color3.fromRGB(255, 255, 255)
+    slider.Font = Enum.Font.SourceSansBold
+    slider.TextSize = 18
     slider.Parent = frame
 
-    -- Connect the slider value change event to the callback
-    slider.Changed:Connect(function(newValue)
+    -- Connect the slider adjustment to the callback
+    slider.MouseButton1Click:Connect(function()
+        local currentValue = math.random(minValue or 0, maxValue or 100) -- Simulated value change
         if callback then
-            callback(newValue)
+            callback(currentValue)
         end
     end)
 
