@@ -1,0 +1,31 @@
+-- UI Library Module
+local UILibrary = {}
+
+-- Function to create a new button
+function UILibrary.CreateButton(parent, buttonText, position, size, callback)
+    -- Create the button
+    local button = Instance.new("TextButton")
+    
+    -- Set default properties
+    button.Text = buttonText or "Button"
+    button.Position = position or UDim2.new(0.5, 0, 0.5, 0)
+    button.Size = size or UDim2.new(0, 200, 0, 50)
+    button.AnchorPoint = Vector2.new(0.5, 0.5)
+    button.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Font = Enum.Font.SourceSansBold
+    button.TextSize = 24
+
+    -- Parent the button to the provided parent (usually ScreenGui)
+    button.Parent = parent
+    
+    -- Set up a click event for the button
+    if callback then
+        button.MouseButton1Click:Connect(callback)
+    end
+
+    -- Return the button in case further customization is needed
+    return button
+end
+
+return UILibrary
