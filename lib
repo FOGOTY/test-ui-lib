@@ -1,10 +1,11 @@
 -- UI Library Module
 local UILibrary = {}
 
--- Variables to track button positioning
-local buttonCount = 0
-local buttonSpacing = 10 -- Space between buttons
+-- Variables to track button/input positioning
+local elementCount = 0
+local elementSpacing = 10 -- Space between elements
 local defaultButtonSize = UDim2.new(0, 200, 0, 50)
+local defaultInputSize = UDim2.new(0, 200, 0, 30)
 
 -- Function to make a frame draggable
 local function MakeFrameDraggable(frame, dragHandle)
@@ -52,8 +53,8 @@ end
 function UILibrary.CreateFrame(parent)
     -- Create a frame
     local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 250, 0, 300)
-    frame.Position = UDim2.new(0.5, -125, 0.5, -150) -- Center frame
+    frame.Size = UDim2.new(0, 300, 0, 400)
+    frame.Position = UDim2.new(0.5, -150, 0.5, -200) -- Center frame
     frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     frame.BorderSizePixel = 2
     frame.BorderColor3 = Color3.fromRGB(255, 255, 255)
@@ -95,8 +96,8 @@ end
 
 -- Function to create a new button inside the frame
 function UILibrary.CreateButton(frame, buttonText, callback)
-    -- Calculate position based on the number of buttons
-    local buttonPosition = UDim2.new(0.5, 0, 0, 30 + buttonCount * (defaultButtonSize.Y.Offset + buttonSpacing))
+    -- Calculate position based on the number of elements
+    local buttonPosition = UDim2.new(0.5, 0, 0, 30 + elementCount * (defaultButtonSize.Y.Offset + elementSpacing))
 
     -- Create the button
     local button = Instance.new("TextButton")
@@ -119,16 +120,59 @@ function UILibrary.CreateButton(frame, buttonText, callback)
         button.MouseButton1Click:Connect(callback)
     end
 
-    -- Increment button count to adjust position for the next button
-    buttonCount = buttonCount + 1
+    -- Increment element count to adjust position for the next element
+    elementCount = elementCount + 1
 
     -- Return the button in case further customization is needed
     return button
 end
 
--- Reset button count (useful if you want to reset the button positions later)
-function UILibrary.ResetButtonCount()
-    buttonCount = 0
+-- Function to create a new input field with an action button inside the frame
+function UILibrary.CreateInput(frame, placeholderText, buttonText, callback)
+    -- Calculate position based on the number of elements
+    local inputPosition = UDim2.new(0.5, 0, 0, 30 + elementCount * (defaultInputSize.Y.Offset + elementSpacing))
+
+    -- Create a TextBox for input
+    local inputBox = Instance.new("TextBox")
+    inputBox.PlaceholderText = placeholderText or "Enter text..."
+    inputBox.Position = inputPosition
+    inputBox.Size = defaultInputSize
+    inputBox.AnchorPoint = Vector2.new(0.5, 0)
+    inputBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    inputBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+    inputBox.Font = Enum.Font.SourceSans
+    inputBox.TextSize = 18
+    inputBox.Parent = frame
+
+    -- Create the submit button
+    local submitButton = Instance.new("TextButton")
+    submitButton.Text = buttonText or "Submit"
+    submitButton.Position = inputPosition + UDim2.new(0, 0, 0, defaultInputSize.Y.Offset + elementSpacing)
+    submitButton.Size = defaultInputSize
+    submitButton.AnchorPoint = Vector2.new(0.5, 0)
+    submitButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    submitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    submitButton.Font = Enum.Font.SourceSansBold
+    submitButton.TextSize = 18
+    submitButton.Parent = frame
+
+    -- Connect the button click to the callback, passing the TextBox value
+    submitButton.MouseButton1Click:Connect(function()
+        if callback then
+            callback(inputBox.Text)
+        end
+    end)
+
+    -- Increment element count for positioning the next UI element
+    elementCount = elementCount + 2
+
+    -- Return the inputBox and submitButton for further customization if needed
+    return inputBox, submitButton
+end
+
+-- Reset element count (useful if you want to reset the element positions later)
+function UILibrary.ResetElementCount()
+    elementCount = 0
 end
 
 return UILibrary
