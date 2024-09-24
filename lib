@@ -3,7 +3,7 @@ local UILibrary = {}
 
 -- Variables to track element positioning
 local elementCount = 0
-local elementSpacing = 15 -- Space between elements (larger for more separation)
+local elementSpacing = 15 -- Space between elements
 local defaultButtonSize = UDim2.new(0, 200, 0, 50)
 local defaultInputSize = UDim2.new(0, 200, 0, 30)
 local defaultSliderSize = UDim2.new(0, 200, 0, 30)
@@ -52,13 +52,17 @@ end
 
 -- Function to create the main UI frame and close button
 function UILibrary.CreateFrame(parent)
-    -- Create a frame
-    local frame = Instance.new("Frame")
+    -- Create a scrollable frame (ScrollingFrame)
+    local frame = Instance.new("ScrollingFrame")
     frame.Size = UDim2.new(0, 300, 0, 400)
     frame.Position = UDim2.new(0.5, -150, 0.5, -200) -- Center frame
     frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     frame.BorderSizePixel = 2
     frame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    frame.ScrollBarThickness = 10
+    frame.CanvasSize = UDim2.new(0, 0, 0, 0) -- This will adjust as you add elements
+    frame.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 100)
+    frame.AutomaticCanvasSize = Enum.AutomaticSize.Y -- Automatic vertical scrolling
     frame.Parent = parent
 
     -- Create a draggable title bar
@@ -124,6 +128,9 @@ function UILibrary.CreateButton(frame, buttonText, callback)
     -- Increment element count to adjust position for the next element
     elementCount = elementCount + 1
 
+    -- Adjust the CanvasSize of the frame to accommodate new elements
+    frame.CanvasSize = UDim2.new(0, 0, 0, (elementCount * (defaultButtonSize.Y.Offset + elementSpacing)) + 60)
+
     -- Return the button in case further customization is needed
     return button
 end
@@ -166,6 +173,9 @@ function UILibrary.CreateInput(frame, placeholderText, buttonText, callback)
 
     -- Increment element count for positioning the next UI element
     elementCount = elementCount + 2
+
+    -- Adjust the CanvasSize of the frame to accommodate new elements
+    frame.CanvasSize = UDim2.new(0, 0, 0, (elementCount * (defaultInputSize.Y.Offset + elementSpacing)) + 60)
 
     -- Return the inputBox and submitButton for further customization if needed
     return inputBox, submitButton
@@ -210,6 +220,9 @@ function UILibrary.CreateSlider(frame, sliderText, minValue, maxValue, callback)
 
     -- Increment element count for positioning the next UI element
     elementCount = elementCount + 2
+
+    -- Adjust the CanvasSize of the frame to accommodate new elements
+    frame.CanvasSize = UDim2.new(0, 0, 0, (elementCount * (defaultSliderSize.Y.Offset + elementSpacing)) + 60)
 
     -- Return the slider for further customization if needed
     return slider
