@@ -7,6 +7,7 @@ local elementSpacing = 15 -- Space between elements
 local defaultButtonSize = UDim2.new(0, 200, 0, 50)
 local defaultInputSize = UDim2.new(0, 200, 0, 30)
 local defaultSliderSize = UDim2.new(0, 200, 0, 30)
+local defaultToggleSize = UDim2.new(0, 200, 0, 50)
 
 -- Function to make a frame draggable
 local function MakeFrameDraggable(frame, dragHandle)
@@ -226,6 +227,55 @@ function UILibrary.CreateSlider(frame, sliderText, minValue, maxValue, callback)
 
     -- Return the slider for further customization if needed
     return slider
+end
+
+-- New Function to create a toggle button inside the frame
+function UILibrary.CreateToggle(frame, toggleText, callback)
+    -- Calculate position based on the number of elements and spacing
+    local togglePosition = UDim2.new(0.5, 0, 0, 30 + elementCount * (defaultToggleSize.Y.Offset + elementSpacing))
+
+    -- Create the toggle button
+    local toggleButton = Instance.new("TextButton")
+    toggleButton.Text = toggleText or "Toggle Off"
+    toggleButton.Position = togglePosition
+    toggleButton.Size = defaultToggleSize
+    toggleButton.AnchorPoint = Vector2.new(0.5, 0)
+    toggleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- Default to "off"
+    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    toggleButton.Font = Enum.Font.SourceSansBold
+    toggleButton.TextSize = 24
+
+    -- Track the toggle state (off by default)
+    local isOn = false
+
+    -- Set up the toggle functionality
+    toggleButton.MouseButton1Click:Connect(function()
+        isOn = not isOn -- Toggle the state
+        if isOn then
+            toggleButton.Text = toggleText or "Toggle On"
+            toggleButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- Change to "on"
+        else
+            toggleButton.Text = toggleText or "Toggle Off"
+            toggleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- Change to "off"
+        end
+
+        -- Trigger the callback with the current state
+        if callback then
+            callback(isOn)
+        end
+    end)
+
+    -- Parent the button to the provided frame
+    toggleButton.Parent = frame
+
+    -- Increment element count for positioning the next UI element
+    elementCount = elementCount + 1
+
+    -- Adjust the CanvasSize of the frame to accommodate new elements
+    frame.CanvasSize = UDim2.new(0, 0, 0, (elementCount * (defaultToggleSize.Y.Offset + elementSpacing)) + 60)
+
+    -- Return the toggleButton in case further customization is needed
+    return toggleButton
 end
 
 -- Reset element count (useful if you want to reset the element positions later)
