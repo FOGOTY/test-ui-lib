@@ -10,6 +10,7 @@ local defaultSliderSize = UDim2.new(0, 200, 0, 30)
 local defaultToggleSize = UDim2.new(0, 200, 0, 50)
 local defaultLabelSize = UDim2.new(0, 200, 0, 30)
 local defaultKeybindSize = UDim2.new(0, 200, 0, 50)
+local defaultColorPickSize = UDim2.new(0, 200, 0, 50)
 
 -- Function to make a frame draggable
 local function MakeFrameDraggable(frame, dragHandle)
@@ -362,6 +363,91 @@ function UILibrary.CreateKeybind(frame, bindText, callback)
 
     -- Return the keybindButton for further customization if needed
     return keybindButton
+end
+function UILibrary.CreateColorPick(frame, pickText, callback)
+    -- Calculate position based on the number of elements and spacing
+    local colorPickPosition = UDim2.new(0.5, 0, 0, 30 + elementCount * (defaultColorPickSize.Y.Offset + elementSpacing))
+
+    -- Create a button for the color picker
+    local colorPickButton = Instance.new("TextButton")
+    colorPickButton.Text = pickText or "Pick a Color"
+    colorPickButton.Position = colorPickPosition
+    colorPickButton.Size = defaultColorPickSize
+    colorPickButton.AnchorPoint = Vector2.new(0.5, 0)
+    colorPickButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- Default white
+    colorPickButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+    colorPickButton.Font = Enum.Font.SourceSansBold
+    colorPickButton.TextSize = 24
+    colorPickButton.Parent = frame
+
+    -- Create a Frame to hold color sliders (RGB sliders)
+    local colorFrame = Instance.new("Frame")
+    colorFrame.Size = UDim2.new(0, 200, 0, 150)
+    colorFrame.Position = UDim2.new(0.5, 0, 0, colorPickPosition.Y.Offset + 60)
+    colorFrame.AnchorPoint = Vector2.new(0.5, 0)
+    colorFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    colorFrame.Visible = false
+    colorFrame.Parent = frame
+
+    -- RGB Sliders for selecting color
+    local sliders = {}
+    local colors = {"R", "G", "B"}
+    local rgbValues = {255, 255, 255}
+
+    for i, color in ipairs(colors) do
+        local slider = Instance.new("TextButton")
+        slider.Size = UDim2.new(0, 180, 0, 30)
+        slider.Position = UDim2.new(0.5, 0, 0, (i - 1) * 40)
+        slider.AnchorPoint = Vector2.new(0.5, 0)
+        slider.Text = color .. ": " .. rgbValues[i]
+        slider.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        slider.Parent = colorFrame
+
+        -- Adjust slider values on click (simulating real slider for simplicity)
+        slider.MouseButton1Click:Connect(function()
+            local newValue = math.random(0, 255) -- Random value for simplicity
+            rgbValues[i] = newValue
+            slider.Text = color .. ": " .. newValue
+            slider.BackgroundColor3 = Color3.fromRGB(rgbValues[1], rgbValues[2], rgbValues[3])
+        end)
+
+        table.insert(sliders, slider)
+    end
+
+    -- Toggle color frame visibility on button click
+    colorPickButton.MouseButton1Click:Connect(function()
+        colorFrame.Visible = not colorFrame.Visible
+    end)
+
+    -- Apply the selected color to the button or trigger callback
+    local applyButton = Instance.new("TextButton")
+    applyButton.Size = UDim2.new(0, 180, 0, 30)
+    applyButton.Position = UDim2.new(0.5, 0, 0, 130)
+    applyButton.AnchorPoint = Vector2.new(0.5, 0)
+    applyButton.Text = "Apply Color"
+    applyButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    applyButton.Parent = colorFrame
+
+    -- Apply the selected color to the colorPickButton and call the callback
+    applyButton.MouseButton1Click:Connect(function()
+        local selectedColor = Color3.fromRGB(rgbValues[1], rgbValues[2], rgbValues[3])
+        colorPickButton.BackgroundColor3 = selectedColor
+        colorFrame.Visible = false
+
+        -- Trigger the callback with the selected color
+        if callback then
+            callback(selectedColor)
+        end
+    end)
+
+    -- Increment element count for positioning the next UI element
+    elementCount = elementCount + 1
+
+    -- Adjust the CanvasSize of the frame to accommodate new elements
+    frame.CanvasSize = UDim2.new(0, 0, 0, (elementCount * (defaultColorPickSize.Y.Offset + elementSpacing)) + 60)
+
+    -- Return the color picker button for further customization if needed
+    return colorPickButton
 end
 -- Reset element count (useful if you want to reset the element positions later)
 function UILibrary.ResetElementCount()
