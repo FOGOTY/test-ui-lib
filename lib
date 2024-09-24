@@ -499,7 +499,56 @@ function UILibrary.CreateFrameWithMinimize(parent)
     -- Return the frame for adding UI elements
     return frame
 end
+function UILibrary.ToggleUIBind(frame, defaultKey)
+    local selectedKey = defaultKey or Enum.KeyCode.F -- Default to "F" if no key is specified
+    local isVisible = true -- UI is visible by default
 
+    -- Listen for the keypress to toggle visibility
+    game:GetService("UserInputService").InputBegan:Connect(function(input)
+        if input.KeyCode == selectedKey then
+            isVisible = not isVisible
+            frame.Visible = isVisible
+        end
+    end)
+
+    -- Create a button that allows the user to rebind the toggle key
+    local rebindButton = Instance.new("TextButton")
+    rebindButton.Size = UDim2.new(0, 200, 0, 50)
+    rebindButton.Position = UDim2.new(0.5, 0, 0, 30 + elementCount * (defaultButtonSize.Y.Offset + elementSpacing))
+    rebindButton.AnchorPoint = Vector2.new(0.5, 0)
+    rebindButton.Text = "Bind Toggle Key (Current: " .. selectedKey.Name .. ")"
+    rebindButton.BackgroundColor3 = Color3.fromRGB(170, 170, 255)
+    rebindButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    rebindButton.Font = Enum.Font.SourceSansBold
+    rebindButton.TextSize = 24
+    rebindButton.Parent = frame
+
+    -- Variable to track if we are waiting for a new key press
+    local waitingForKey = false
+
+    -- Detect keypress for rebinding
+    rebindButton.MouseButton1Click:Connect(function()
+        rebindButton.Text = "Press any key..."
+        waitingForKey = true
+    end)
+
+    game:GetService("UserInputService").InputBegan:Connect(function(input)
+        if waitingForKey and input.UserInputType == Enum.UserInputType.Keyboard then
+            selectedKey = input.KeyCode
+            rebindButton.Text = "Bind Toggle Key (Current: " .. selectedKey.Name .. ")"
+            waitingForKey = false
+        end
+    end)
+
+    -- Increment element count for positioning the next UI element
+    elementCount = elementCount + 1
+
+    -- Adjust the CanvasSize of the frame to accommodate new elements
+    frame.CanvasSize = UDim2.new(0, 0, 0, (elementCount * (defaultButtonSize.Y.Offset + elementSpacing)) + 60)
+
+    -- Return the rebind button for customization if needed
+    return rebindButton
+end
 -- Reset element count (useful if you want to reset the element positions later)
 function UILibrary.ResetElementCount()
     elementCount = 0
