@@ -1,4 +1,4 @@
---how tto use this ui
+--how to use this ui
 
 -- Require the UI Library module
 local UILibrary = loadstring(game:HttpGet(('https://raw.githubusercontent.com/FOGOTY/test-ui-lib/refs/heads/main/lib')))()
