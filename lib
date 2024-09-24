@@ -9,6 +9,7 @@ local defaultInputSize = UDim2.new(0, 200, 0, 30)
 local defaultSliderSize = UDim2.new(0, 200, 0, 30)
 local defaultToggleSize = UDim2.new(0, 200, 0, 50)
 local defaultLabelSize = UDim2.new(0, 200, 0, 30)
+local defaultKeybindSize = UDim2.new(0, 200, 0, 50)
 
 -- Function to make a frame draggable
 local function MakeFrameDraggable(frame, dragHandle)
@@ -302,6 +303,65 @@ function UILibrary.CreateLabel(frame, labelText)
 
     -- Return the label for further customization if needed
     return label
+end
+
+function UILibrary.CreateKeybind(frame, bindText, callback)
+    -- Calculate position based on the number of elements and spacing
+    local keybindPosition = UDim2.new(0.5, 0, 0, 30 + elementCount * (defaultKeybindSize.Y.Offset + elementSpacing))
+
+    -- Create a button for selecting the keybind
+    local keybindButton = Instance.new("TextButton")
+    keybindButton.Text = bindText or "Press a Key"
+    keybindButton.Position = keybindPosition
+    keybindButton.Size = defaultKeybindSize
+    keybindButton.AnchorPoint = Vector2.new(0.5, 0)
+    keybindButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    keybindButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    keybindButton.Font = Enum.Font.SourceSansBold
+    keybindButton.TextSize = 24
+    keybindButton.Parent = frame
+
+    -- Variable to store the selected key
+    local selectedKey = nil
+    local waitingForKey = false
+
+    -- Function to detect key press for binding
+    local function detectKeyPress(input)
+        if waitingForKey then
+            if input.UserInputType == Enum.UserInputType.Keyboard then
+                selectedKey = input.KeyCode
+                keybindButton.Text = "Bound to: " .. tostring(selectedKey.Name)
+                waitingForKey = false
+            end
+        end
+    end
+
+    -- Button click to start listening for a key press
+    keybindButton.MouseButton1Click:Connect(function()
+        keybindButton.Text = "Press any key..."
+        waitingForKey = true
+    end)
+
+    -- Bind to input events to detect the keypress
+    game:GetService("UserInputService").InputBegan:Connect(function(input)
+        detectKeyPress(input)
+    end)
+
+    -- Listen for key presses to trigger the callback
+    game:GetService("UserInputService").InputBegan:Connect(function(input)
+        if input.KeyCode == selectedKey and callback then
+            callback()
+        end
+    end)
+
+    -- Increment element count for positioning the next UI element
+    elementCount = elementCount + 1
+
+    -- Adjust the CanvasSize of the frame to accommodate new elements
+    frame.CanvasSize = UDim2.new(0, 0, 0, (elementCount * (defaultKeybindSize.Y.Offset + elementSpacing)) + 60)
+
+    -- Return the keybindButton for further customization if needed
+    return keybindButton
 end
 -- Reset element count (useful if you want to reset the element positions later)
 function UILibrary.ResetElementCount()
