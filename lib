@@ -8,6 +8,7 @@ local defaultButtonSize = UDim2.new(0, 200, 0, 50)
 local defaultInputSize = UDim2.new(0, 200, 0, 30)
 local defaultSliderSize = UDim2.new(0, 200, 0, 30)
 local defaultToggleSize = UDim2.new(0, 200, 0, 50)
+local defaultLabelSize = UDim2.new(0, 200, 0, 30)
 
 -- Function to make a frame draggable
 local function MakeFrameDraggable(frame, dragHandle)
@@ -277,7 +278,31 @@ function UILibrary.CreateToggle(frame, toggleText, callback)
     -- Return the toggleButton in case further customization is needed
     return toggleButton
 end
+function UILibrary.CreateLabel(frame, labelText)
+    -- Calculate position based on the number of elements and spacing
+    local labelPosition = UDim2.new(0.5, 0, 0, 30 + elementCount * (defaultLabelSize.Y.Offset + elementSpacing))
 
+    -- Create the label
+    local label = Instance.new("TextLabel")
+    label.Text = labelText or "Label"
+    label.Position = labelPosition
+    label.Size = defaultLabelSize
+    label.AnchorPoint = Vector2.new(0.5, 0) -- Center the label
+    label.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Set background color
+    label.TextColor3 = Color3.fromRGB(255, 255, 255) -- Set text color
+    label.Font = Enum.Font.SourceSans -- Font style
+    label.TextSize = 24 -- Font size
+    label.Parent = frame
+
+    -- Increment element count for positioning the next UI element
+    elementCount = elementCount + 1
+
+    -- Adjust the CanvasSize of the frame to accommodate new elements
+    frame.CanvasSize = UDim2.new(0, 0, 0, (elementCount * (defaultLabelSize.Y.Offset + elementSpacing)) + 60)
+
+    -- Return the label for further customization if needed
+    return label
+end
 -- Reset element count (useful if you want to reset the element positions later)
 function UILibrary.ResetElementCount()
     elementCount = 0
