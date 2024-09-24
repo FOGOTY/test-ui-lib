@@ -29,4 +29,33 @@ UILibrary.CreateSlider(frame, "slidername", 0, 100, function(value)
     print("Slider Value: " .. value)
 end)
 
+-- Create a toggle button
+UILibrary.CreateToggle(frame, "Enable/Disable", function(state)
+    if state then
+        print("Toggle is ON")
+    else
+        print("Toggle is OFF")
+    end
+end)
+
+-- Create another label
+UILibrary.CreateLabel(frame, "This is a label")
+
+
+-- Create a keybind button
+UILibrary.CreateKeybind(frame, "Bind Key", function()
+    print("Keybind activated!")
+end)
+
+
+-- Create a color picker
+UILibrary.CreateColorPick(frame, "Pick Background Color", function(selectedColor)
+    print("Selected Color: ", selectedColor)
+    -- Example: Use the color to change the background of the ScreenGui
+    screenGui.BackgroundColor3 = selectedColor
+end)
+
+
+-- Create a toggle UI keybind button inside the frame
+UILibrary.ToggleUIBind(frame, Enum.KeyCode.LeftAlt)  -- Default keybind to "LeftAlt"
 
